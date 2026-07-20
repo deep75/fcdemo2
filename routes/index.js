@@ -90,8 +90,8 @@ router.get('/debug', function (req, res) {
     var sub = null;
     if (req.session.idToken) {
         var idTokenSegments = req.session.idToken.split('.');
-        idToken = new Buffer(idTokenSegments[1], 'base64').toString();
-        sub = JSON.parse(new Buffer(idTokenSegments[1], 'base64').toString()).sub;
+        idToken = Buffer.from(idTokenSegments[1], 'base64').toString();
+        sub = JSON.parse(Buffer.from(idTokenSegments[1], 'base64').toString()).sub;
     }
     res.render('debug', {headers: req.headers, session: req.session, idToken: idToken, sub: sub});
 });

@@ -1,7 +1,60 @@
-Test réseau
+# fcdemo2 — Démonstrateur Fournisseur de Service FranceConnect
 
-##Pour installer l'application:
-`npm install`
+Application Node.js/Express de démonstration d'un fournisseur de service (FS) utilisant l'authentification FranceConnect via OpenID Connect et Passport.js.
 
-##Pour lancer l'application :
-`PORT=3001 npm start`
+## Prérequis
+
+- Node.js >= 14.x
+- npm >= 6.x
+
+## Installation
+
+```sh
+npm install
+```
+
+## Configuration
+
+Copiez le fichier d'exemple et renseignez vos valeurs :
+
+```sh
+cp .env.example .env
+# Éditez .env avec vos vrais identifiants
+```
+
+### Variables d'environnement
+
+| Variable          | Obligatoire | Description                                                        |
+|-------------------|-------------|--------------------------------------------------------------------|
+| `SESSION_SECRET`  | **Oui**     | Secret pour les sessions Express (chaîne aléatoire longue)        |
+| `FC_CLIENT_ID`    | Non         | Client ID FranceConnect (sinon lu depuis config/config.json)      |
+| `FC_CLIENT_SECRET`| Non         | Client Secret FranceConnect (sinon lu depuis config/config.json)  |
+| `NODE_ENV`        | Non         | `development` (défaut) ou `production`                            |
+
+> **Sécurité** : En production, `SESSION_SECRET` est obligatoire et l'application refuse de démarrer si elle n'est pas définie. Ne jamais committer le fichier `.env`.
+
+## Lancer l'application
+
+```sh
+SESSION_SECRET=mon-secret-long PORT=3001 npm start
+```
+
+## Tests
+
+```sh
+npm test
+```
+
+## Notes sur les dépendances
+
+- **`request`** : Ce paquet est déprécié (plus maintenu depuis 2020). Il est conservé pour des raisons de compatibilité avec l'appel vers le Fournisseur de Données. Pour une évolution future, préférer [`node-fetch`](https://github.com/node-fetch/node-fetch) ou [`axios`](https://axios-http.com/).
+
+## Architecture
+
+- `app.js` — Point d'entrée Express, configuration Passport/session
+- `routes/index.js` — Routes principales (login, callback OIDC, logout)
+- `routes/data.js` — Routes fournisseur de données (OAuth2, quotient familial)
+- `helpers/configManager.js` — Gestion de la configuration (avec surcharge via env vars)
+- `helpers/passportAuthenticateWithCustomClaims.js` — Stratégie OIDC personnalisée avec support ACR/claims
+- `views/` — Templates EJS
+- `config/config.json` — Configuration par défaut (environnement d'intégration FranceConnect)

@@ -34,7 +34,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({ secret: 'Some Secret !!!', key: 'sid'}));
+var sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error('SESSION_SECRET environment variable is required in production');
+    }
+    sessionSecret = 'dev-only-insecure-secret-set-SESSION_SECRET-env-var';
+    console.warn('WARNING: SESSION_SECRET not set. Using insecure default (development only).');
+}
+
+app.use(session({
+    secret: sessionSecret,
+    name: 'sid',
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
